@@ -1,21 +1,38 @@
-# format I CB [L0 L1 ...] V0 V1 ...; I integer part, CB control byte, Li no. of bits > 7f, Vj value bits
+# format S0 S1 ... I V0 V1 ...; Si no. of bytes in decimal expansion, I integer part (1 byte), Vj decimals in MSB order
 00 61 73 6d # asm
 01 00 00 00 # ver
 
 01 # section code (type)
-0c # section size
-02 # num of types
+1d # section size
+05 # num of types
 60 # func
 02 # num of params
 7f # i32
 7f # i32
 00 # num of results
 60 # func
+01 # num of params
+7f # i32
+00 # num of params
+60 # func
 02 # num of params
 7f # i32
 7f # i32
 01 # num of results
 7f # i32
+60 # func
+03 # num of params
+7f # i32
+7f # i32
+7f # i32
+00 # num of results
+60 # func
+04 # num of params
+7f # i32
+7f # i32
+7f # i32
+7f # i32
+00 # num of results
 
 02       # section code (import)
 0b       # section size
@@ -28,10 +45,14 @@
 00 01    # limits
 
 03 # section code (function)
-03 # section size
-02 # num of functions
+07 # section size
+06 # num of functions
+00 # function index
 00 # function index
 01 # function index
+02 # function index
+03 # function index
+04 # function index
 
 07       # section code (export)
 07       # section size
@@ -44,8 +65,8 @@
 # nk(p0),p(p1),k(l2),mi(l3),sk(l4),scratch(l5),scratch(l6),scratch(l7)
 
 0a          # section code (code)
-bd 01       # section size
-02          # num of functions
+aa 05       # section size
+06          # num of functions
 ab 01       # function body size
 01          # local declaration count
 06 7f       # local type count & type (i32)
@@ -142,14 +163,204 @@ ab 01       # function body size
 20 02       # local.get 02
 41 03       # i32.const 03
 76          # i32.shr_u
-10 01       # call 01
+10 03       # call 03
 21 03       # local.set 03
 20 03       # local.get 03
 20 04       # local.get 04
-10 01       # call 01
+10 03       # call 03
 21 03       # local.set 03
 0b          # end
 
+         # -: v1(00),v2(01),sz1(02),sz2(03),sz(04),isz(05),c(06),lsb1(07),scratch(08)
+b7 01    # function body size
+01       # local declaration size
+07 7f    # local count type & type (i32)
+41 84 18 # i32.const 84 18 (0c04)
+21 08    # local.set 08
+20 00    # local.get 00
+2f       # i32.load16_u
+01 00    # alignment & offset
+21 02    # local.set 02
+20 01    # local.get 01
+2f       # i32.load16_u
+01 00    # alignment & offset
+21 03    # local.set 03
+20 00    # local.get 00
+41 01    # i32.const 01
+6a       # i32.add
+20 02    # local.get 02
+6a       # i32.add
+21 00    # local.set 00
+20 01    # local.get 01
+41 01    # i32.const 01
+6a       # i32.add
+20 03    # local.get 03
+6a       # i32.add
+21 01    # local.set 01
+03 40    # loop & type
+20 00    # local.get 00
+20 05    # local.get 05
+6b       # i32.sub
+2d       # i32.load8_u
+00 00    # alignment & offset
+41 80 02 # i32.const 80 02 (100)
+6a       # i32.add
+20 06    # local.get 06
+6b       # i32.sub
+20 05    # local.get 05
+20 03    # local.get 03
+49       # i32.lt_u
+04 7f    # if & type (i32)
+20 01    # local.get 01
+20 05    # local.get 05
+6b       # i32.sub
+2d       # i32.load8_u
+00 00    # alignment & offset
+05       # else
+41 00    # i32.const 00
+0b       # end
+6b       # i32.sub
+21 07    # local.set 07
+20 07    # local.get 07
+41 08    # i32.const 08
+76       # i32.shr_u
+45       # i32.eqz
+21 06    # local.set 06
+20 07    # local.get 07
+41 ff 01 # i32.const ff 01 (ff)
+71       # i32.and
+21 07    # local.set 07
+20 08    # local.get 08
+20 05    # local.get 05
+6a       # i32.add
+20 07    # local.get 07
+3a       # i32.store8
+00 00    # alignment & offset
+20 05    # local.get 05
+41 01    # i32.const 01
+6a       # i32.add
+21 05    # local.set 05
+20 07    # local.get 07
+41 00    # i32.const 00
+47       # i32.ne
+04 40    # if & type
+20 05    # local.get 05
+21 04    # local.set 04
+0b       # end
+20 05    # local.get 05
+20 02    # local.get 02
+49       # i32.lt_u
+20 05    # local.set 05
+20 03    # local.set 03
+49       # i32.lt_u
+20 06    # local.set 06
+41 00    # i32.const 00
+47       # i32.ne
+72       # i32.or
+20 07    # local.get 07
+41 00    # i32.const 00
+47       # i32.ne
+72       # i32.or
+71       # i32.and
+0d 00    # br_if & depth
+0b       # end
+20 00    # local.get 00
+20 02    # local.get 02
+6b       # i32.sub
+41 01    # i32.const 01
+6b       # i32.sub
+20 08    # local.get 08
+20 02    # local.get 02
+20 05    # local.get 05
+47       # i32.ne
+04 7f    # if & type (i32)
+20 05    # local.get 05
+05       # else
+20 04    # local.get 04
+0b       # end
+20 02    # local.get 02
+20 05    # local.get 05
+47       # i32.ne
+10 04    # call 04
+0b       # end
+
+      # ++: d(00),scratch(01),sz(02),c(03),i(04),lsb(05)
+79    # function body size
+01    # local declaration size
+05 7f # local count type & type (i32)
+20 00 # local.get 00
+2f    # i32.load16_u
+01 00 # alignment & offset
+21 02 # local.set 02
+41 01 # i32.const 01
+21 03 # local.set 03
+20 00 # local.get 00
+41 01 # i32.const 01
+6a    # i32.add
+20 02 # local.get 02
+6a    # i32.add
+21 00 # local.set 00
+03 40 # loop & type
+20 00 # local.get 00
+20 04 # local.get 04
+6b    # i32.sub
+2d    # i32.load8_u
+00 00 # alignment & offset
+20 03 # local.get 03
+6a    # i32.add
+21 05 # local.set 05
+20 01 # local.get 01
+20 04 # local.get 04
+6a    # i32.sub
+20 05 # local.get 05
+3a    # i32.store8
+00 00 # alignment & offset
+20 05 # local.get 05
+41 08 # i32.const 08
+76    # i32.shr_u
+21 03 # local.set 03
+20 04 # local.get 04
+41 01 # i32.const 01
+6a    # i32.add
+21 04 # local.set 04
+20 04 # local.get 04
+20 02 # local.get 02
+49    # i32.lt_u
+20 03 # local.get 03
+41 00 # i32.const 00
+47    # i32.ne
+71    # i32.and
+0d 00 # br_if & depth
+0b    # end
+20 00 # local.get 00
+41 01 # i32.const 01
+6b    # i32.sub
+20 02 # local.get 02
+6b    # i32.sub
+21 00 # local.set 00
+20 01 # local.get 01
+20 04 # local.get 04
+6a    # i32.add
+20 03 # local.get 03
+3a    # i32.store8
+00 00 # alignment & offset
+20 00 # local.get 00
+20 01 # local.get 01
+20 02 # local.get 02
+20 03 # local.get 03
+6a    # i32.add
+20 04 # local.get 04
+20 02 # local.get 02
+20 03 # local.get 03
+6a    # i32.add
+47    # i32.ne
+20 03 # local.get 03
+45    # i32.eqz
+71    # i32.and
+10 04 # call 04
+0b    # end
+
+      # !++: d(00),s(01)
 0e    # function body size
 00    # local declaration size
 20 00 # local.get 00
@@ -161,7 +372,123 @@ ab 01       # function body size
 6a    # i32.add
 0b    # end
 
+      # ++: d(00),scratch(01),sz(02),c(03),i(04),lsb(05)
+79    # function body size
+01    # local declaration size
+05 7f # local count type & type (i32)
+20 00 # local.get 00
+2f    # i32.load16_u
+01 00 # alignment & offset
+21 02 # local.set 02
+41 01 # i32.const 01
+21 03 # local.set 03
+20 00 # local.get 00
+41 01 # i32.const 01
+6a    # i32.add
+20 02 # local.get 02
+6a    # i32.add
+21 00 # local.set 00
+03 40 # loop & type
+20 00 # local.get 00
+20 04 # local.get 04
+6b    # i32.sub
+2d    # i32.load8_u
+00 00 # alignment & offset
+20 03 # local.get 03
+6a    # i32.add
+21 05 # local.set 05
+20 01 # local.get 01
+20 04 # local.get 04
+6a    # i32.sub
+20 05 # local.get 05
+3a    # i32.store8
+00 00 # alignment & offset
+20 05 # local.get 05
+41 08 # i32.const 08
+76    # i32.shr_u
+21 03 # local.set 03
+20 04 # local.get 04
+41 01 # i32.const 01
+6a    # i32.add
+21 04 # local.set 04
+20 04 # local.get 04
+20 02 # local.get 02
+49    # i32.lt_u
+20 03 # local.get 03
+41 00 # i32.const 00
+47    # i32.ne
+71    # i32.and
+0d 00 # br_if & depth
+0b    # end
+20 00 # local.get 00
+41 01 # i32.const 01
+6b    # i32.sub
+20 02 # local.get 02
+6b    # i32.sub
+21 00 # local.set 00
+20 01 # local.get 01
+20 04 # local.get 04
+6a    # i32.add
+20 03 # local.get 03
+3a    # i32.store8
+00 00 # alignment & offset
+20 00 # local.get 00
+20 01 # local.get 01
+20 02 # local.get 02
+20 03 # local.get 03
+6a    # i32.add
+20 04 # local.get 04
+20 02 # local.get 02
+20 03 # local.get 03
+6a    # i32.add
+47    # i32.ne
+20 03 # local.get 03
+45    # i32.eqz
+71    # i32.and
+10 01 # call 01
+0b    # end
 
+      # memcpy: d(00),s(01),sz(02),app(03),i(04)
+3f    # function body size
+01    # local declaration size
+01 7f # local count type & type (i32)
+20 03 # local.get 03
+45    # i32.eqz
+04 40 # if & type
+20 00 # local.get 00
+20 02 # local.get 02
+3b    # i32.store16
+01 00 # alignment & offset
+0b    # end
+20 00 # local.get 00
+2f    # i32.load16_u
+01 00 # alignment & type
+20 00 # local.get 00
+41 01 # i32.const 01
+6a    # i32.add
+6a    # i32.add
+21 00 # local.set 00
+03 40 # loop & type
+20 00 # local.get 00
+20 04 # local.get 04
+6b    # i32.sub
+20 01 # local.get 01
+20 04 # local.get 04
+6a    # i32.add
+2d    # i32.load8_u
+00 00 # alignment & type
+3a    # i32.store8
+00 00 # alignment & type
+20 04 # local.get 04
+41 01 # i32.const 01
+6a    # i32.add
+21 04 # local.set 04
+20 04 # local.get 04
+20 02 # local.get 02
+49    # i32.lt_u
+0d 00 # br_if & depth
+0b    # end
+0b    # end
 
 
 
